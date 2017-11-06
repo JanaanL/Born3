@@ -1,5 +1,9 @@
 #pragma once
 #include "base_prop.h"
+#include "born_profiler.h"
+#include "papi.h"
+#include <immintrin.h>
+#include <zmmintrin.h>
 class cpuProp : public baseProp {
 public:
 cpuProp(std::shared_ptr<SEP::genericIO> io);
@@ -21,13 +25,16 @@ virtual void transferReceiverFunc(int nx, int ny, int nt, std::vector<int> &locs
 virtual void transferSincTableS(int nsinc, int jts, std::vector<std::vector<float>> &table);
 virtual void createSpace(float d1, float d2, float d3,float bc_a, float bc_b, float bc_y,
 	int nx, int ny, int nz);
-void prop(float *p0, float *p1, float *vel);
+void copy_blocked(const float* p0, float* b1);  
+void prop_naive(float *p0, const float *p1, const float *vel);
+void prop_blocked(float *p0, const float *p1, float *vel);
+void prop_vec(float *p0, const float *p1, float *vel);
 void injectSource(int id, int ii, float *p1);
 void damp(float *p0, float *p1);
-void imageCondition(float *src, float *rec, float *image);
+void imageCondition(const float *src, const float *rec, float *image);
 void injectReceivers(int id, int ii, float *p1);
-void dataExtract(int id, int ii, float *p);
-void imageAdd(float *img,  float *recField, float *srcField);
+void dataExtract(int id, int ii, const float *p);
+void imageAdd(const float *img,  float *recField, const float *srcField);
 void stats(float *buf, std::string title);
 private:
 int _nptsS;

@@ -4,10 +4,15 @@
 #include <string.h>
 #define MIN(a,b) ( ((a)<(b)) ? (a) : (b) )
 
+
 hypercube_float::hypercube_float(std::vector<SEP::axis> axes,bool alloc){
 	this->initNd(axes);
+	int size = this->getN123() + AVX_SIMD_LENGTH;
 	if(alloc) {
-		this->vals=new float[this->getN123()];
+		float *_vals = (float *)_mm_malloc((size)*sizeof(float), ALIGN);
+		 _vals+=OFFSET;
+		this->vals=_vals;
+		//this->vals=new float[this->getN123()];
 	}
 	else this->vals=0;
 	name="hypercube_float";
@@ -17,13 +22,21 @@ hypercube_float::hypercube_float(std::shared_ptr<SEP::hypercube> hyper){
 	int n=hyper->getNdim();
 	std::vector<SEP::axis> axes=hyper->getAxes(n);
 	this->initNd(axes);
-	this->vals=new float [this->getN123()];
+	int size = this->getN123() + AVX_SIMD_LENGTH;
+	float *_vals = (float *)_mm_malloc((size)*sizeof(float), ALIGN);
+	_vals+=OFFSET;
+	this->vals=_vals;
+	//this->vals=new float [this->getN123()];
 	name="hypercube_float";
 }
 hypercube_float::hypercube_float(std::vector<SEP::axis> axes, float *vals){
 
 	this->initNd(axes);
-	this->vals=new float[this->getN123()];
+	int size = this->getN123() + AVX_SIMD_LENGTH;
+	float *_vals = (float *)_mm_malloc((size)*sizeof(float), ALIGN);
+	_vals+=OFFSET;
+	this->vals=_vals;
+	//this->vals=new float[this->getN123()];
 	this->set(vals);
 	name="hypercube_float";
 }

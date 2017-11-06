@@ -10,32 +10,32 @@ rtm_zero_op::rtm_zero_op(std::shared_ptr<SEP::paramObj> par,
 	std::shared_ptr<vel_fd_3d>vel_3d, std::shared_ptr<source_func>source_func,
 	std::shared_ptr<data_rtm_3d> dat, std::shared_ptr<image_rtm_3d>img,
 	float ap,bool v,bool enc,std::vector<int> r_vec, bool do_src,bool redo_src){
-	std::vector<float> ds;
-	data=dat;
-	setProp(prop);
-	ds.push_back(dat->dt);
+		std::vector<float> ds;
+		data=dat;
+		setProp(prop);
+		ds.push_back(dat->dt);
 
-	ds.push_back(source_func->get_dt());
+		ds.push_back(source_func->get_dt());
 
-	set_vel(vel_3d);
+		set_vel(vel_3d);
 
-	calc_stability(ds,data->nt);
-	set_fd_basics(par,source_func,ap,v);
-	_prop->setNtblock(50);
+		calc_stability(ds,data->nt);
+		set_fd_basics(par,source_func,ap,v);
+		_prop->setNtblock(50);
 
-	image=img;
+		image=img;
 
 	//set_domain(image);
 //	set_range(data);
-	dtd=data->dt;
-	jtd=(int)(dtd/dt);
-	nt=(data->nt-1)*jtd+1;
-	base=0;
-	redo=redo_src;
-	create_transfer_sinc_data(8);
+		dtd=data->dt;
+		jtd=(int)(dtd/dt);
+		nt=(data->nt-1)*jtd+1;
+		base=0;
+		redo=redo_src;
+		create_transfer_sinc_data(8);
 
-	encode=enc;
-	rand_vec=r_vec;
+		encode=enc;
+		rand_vec=r_vec;
 	//if(do_src && !redo) create_source_fields();
 }
 
@@ -273,10 +273,16 @@ bool rtm_zero_op::adjoint(bool add, std::shared_ptr<my_vector>mvec,
 		mapit.adjoint(false,rec_func,shot_deriv);
 
 		_prop->transferReceiverFunc(rec_nx,rec_ny,nt_big,locs,rec_func->vals);
-		_prop->sourceProp(ad1.n,ad2.n,ad3.n,false,true,src_p0->vals,src_p1->vals,jts,nptsS,nt);
-
- 
+		
 		time_t startwtimem, endwtimem;
+		startwtimem = time(&startwtimem);
+		
+		_prop->sourceProp(ad1.n,ad2.n,ad3.n,false,true,src_p0->vals,src_p1->vals,jts,nptsS,nt);
+	
+		endwtimem = time(&endwtimem);
+
+		fprintf(stderr,"Source Prop, wall clock time = %f \n", difftime(endwtimem, startwtimem));
+ 
 		startwtimem = time(&startwtimem);
 
 		_prop->rtmAdjoint(ad1.n,ad2.n,ad3.n,jtd,src_p1->vals,src_p0->vals,img->vals,npts_s,nt);

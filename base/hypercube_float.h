@@ -3,6 +3,12 @@
 #include <axis.h>
 #include <hypercube.h>
 #include <my_vector.h>
+#include <immintrin.h>
+#include <zmmintrin.h>
+
+#define AVX_SIMD_LENGTH 0
+#define ALIGN 0
+#define OFFSET 0
 
 class hypercube_float : public SEP::hypercube, public my_vector {
 
@@ -43,7 +49,10 @@ void set_val(double val);
 void normalize(float val);
 void allocate(){
 	if(this->vals!=0) deallocate();
-	this->vals=new float[this->getN123()];
+	float *_vals = (float *)_mm_malloc((getN123() + AVX_SIMD_LENGTH)*sizeof(float), ALIGN);
+	 _vals+=OFFSET;
+	this->vals=_vals;
+	//this->vals=new float[this->getN123()];
 }
 void init_ndf(std::vector<SEP::axis> ax){
 	initNd(ax); allocate();
@@ -51,7 +60,11 @@ void init_ndf(std::vector<SEP::axis> ax){
 
 
 void deallocate(){
-	if(this->vals!=0) delete []this->vals;
+	//if(this->vals!=0) delete []this->vals;
+	if(this->vals!=0){
+		vals-=OFFSET;
+ 		_mm_free(vals);
+	}
 }
 virtual ~hypercube_float(){
 	this->deallocate();

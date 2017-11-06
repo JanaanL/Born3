@@ -5,10 +5,10 @@
 #include "source_func_3d.h"
 #include "rtm_zero_op_3d.h"
 #include "cpu_prop.h"
+#include <tbb/task_scheduler_init.h>
+int main(int argc, char **argv){
 
-main(int argc, char **argv){
-
-
+	tbb::task_scheduler_init init(32);
 	SEP::ioModes modes(argc,argv);
 
 

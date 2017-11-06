@@ -2,7 +2,6 @@
 rm -rf build
 mkdir build
 cd build
-export CXX=g++
-cmake -DgenericIO_DIR=/sep/bob/genericIO/noSEP/lib -DCMAKE_INSTALL_PREFIX=/sep/bob/Born2 ..
+cmake -DgenericIO_DIR=/home/supercomputes/apps/genericIO/lib -Dhypercube_DIR=/home/supercomputes/apps/hypercube/lib -DCMAKE_INSTALL_PREFIX=/home/supercomputes/apps/sandbox/Born3 ..
 make
 make install
